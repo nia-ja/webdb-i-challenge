@@ -31,8 +31,56 @@ server.get('/api/accounts/:id', async (req, res) => {
             res.status(404).json({ message: "The account with the specified ID does not exist." })
         }
     } catch (error) {
-        res.status(500).json({ message: "The account information could not be retrieved.", error: error })
+        res.status(500).json({ 
+            message: "The account information could not be retrieved.",
+            error: error 
+        })
     }
 })
+
+server.post('/api/accounts', async (req, res) => {
+    try {
+        const account = await Accounts.add(req.body);
+        res.status(201).json(account);
+      } catch (error) {
+        res.status(500).json({
+          message: 'Error adding the account',
+          error: error
+        });
+      }
+});
+
+server.delete('/api/accounts/:id', async (req, res) => {
+    try {
+        const count = await Accounts.remove(req.params.id);
+        if (count > 0) {
+          res.status(200).json({ message: 'The account has been deleted' });
+        } else {
+          res.status(404).json({ message: 'The account could not be found' });
+        }
+      } catch (error) {
+        res.status(500).json({
+          message: 'Error removing the account',
+          error: error
+        });
+      }
+});
+
+server.put('/api/accounts/:id', async (req, res) => {
+    try {
+        const account = await Accounts.update(req.params.id, req.body);
+        if (account === 1) {
+          res.status(200).json({ id: req.params.id, ...req.body });
+        } else {
+          res.status(404).json({ message: 'The account could not be found' });
+        }
+      } catch (error) {
+        res.status(500).json({
+          message: 'Error updating the account',
+          error: error
+        });
+      }
+});
+
 
 module.exports = server;
